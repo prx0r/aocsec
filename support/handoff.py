@@ -51,7 +51,9 @@ def should_escalate(message: str, *, turn_count: int = 0,
 def build_context_package(*, customer_wants: str, tried: list[str],
                           unresolved: str, business_id: str,
                           business_name: str = "",
-                          transcript_tail: list[str] | None = None) -> dict:
+                          transcript_tail: list[str] | None = None,
+                          systems: list[dict] | None = None,
+                          qualifications: list[str] | None = None) -> dict:
     """Compile the handoff package. Max 3-sentence summary + facts."""
     return {
         "business_id": business_id,
@@ -60,6 +62,9 @@ def build_context_package(*, customer_wants: str, tried: list[str],
         "tried": [t[:200] for t in tried[-5:]],
         "unresolved": unresolved[:300],
         "transcript_tail": (transcript_tail or [])[-10:],
+        "systems": [{"name": s.get("name", ""),
+                     "kind": s.get("kind", "")} for s in (systems or [])],
+        "qualifications": list(qualifications or []),
         "instruction": "Start from this package. Do not ask the customer "
                        "to repeat anything above.",
     }

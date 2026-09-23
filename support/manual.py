@@ -93,3 +93,25 @@ def generate_emanual(*, business_name: str, vertical: str,
         "This manual is point-in-time. Ask for a fresh copy any time.",
     ]
     return "\n".join(lines)
+
+
+def manual_for_business(connection, business_id: str,
+                        obligations: list[dict] | None = None,
+                        support_channel: str = "",
+                        assistant_name: str = "Buddy") -> str:
+    """Render the e-manual straight from the stored business graph.
+
+    Raises LookupError for unknown businesses (no manual from thin air).
+    """
+    from .business import get_business
+
+    biz = get_business(connection, business_id)
+    if biz is None:
+        raise LookupError(f"unknown business: {business_id}")
+    return generate_emanual(
+        business_name=biz.get("name", business_id),
+        vertical=biz.get("vertical", ""),
+        systems=biz.get("systems", []),
+        obligations=obligations or [],
+        support_channel=support_channel,
+        assistant_name=assistant_name)
