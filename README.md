@@ -68,7 +68,10 @@ aocsec/
 ├── scheduler/             # job registry + compliance calendar
 ├── vault/                 # content-addressed docs per business
 ├── billing/               # subscription state (no charging, ever)
-└── tests/                 # 215 tests, fully mocked except live-API-free paths
+├── audit/                 # central chained sink + per-business export
+├── onboarding/            # gated pipeline, runbooks, yes-flow, follow-ups
+├── verify/                # public-register methods + attestations
+└── tests/                 # 234 tests, fully mocked except live-API-free paths
 ```
 
 ### Docs index

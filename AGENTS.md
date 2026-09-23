@@ -1,7 +1,7 @@
 # AGENTS.md — aocsec operations
 
 > Security function for POW + aionboard. Read-only unless explicitly authorized.
-> Test suite: `python3 -m unittest discover -s tests` — 215 tests, must stay green.
+> Test suite: `python3 -m unittest discover -s tests` — 234 tests, must stay green.
 
 ## What this repo holds
 
@@ -17,6 +17,9 @@
 | Safe tax organizer | `tax/` (turnover, MTD checklist, records) | user figures in; thresholds user-supplied; no filing |
 | Support backend | `support/` (tickets, handoff, KB, e-manual) | human owns money/legal calls; bot drafts, human sends |
 | Maintenance product | `maintenance/` (plans, monthly runner, certificates) | proposals only; humans send/resolve |
+| Central audit | `audit/` (chained sink + per-business export) | failures never propagate |
+| Onboarding pipeline | `onboarding/` (gates, runbooks, yes-flow, follow-ups) | evidence-gated, never skips |
+| Verification | `verify/` (public registers + attestations) | named human required |
 | WhatsApp delivery | `whatsapp/` (templates, consent, window gates) | builders return payloads; transport sends |
 | Scheduling | `scheduler/` (jobs, compliance calendar) | due-lists, never auto-send |
 | Doc vault + billing | `vault/`, `billing/` (hashstore, plan state) | no charging code exists |
@@ -33,7 +36,7 @@ cd /home/ubuntu/aocsec
 ./scripts/secret-scan.sh     # secrets in repos (read-only)
 ./scripts/perms-audit.sh     # file/token permissions (read-only)
 ./scripts/headers-check.sh   # dashboard headers (read-only)
-python3 -m unittest discover -s tests   # 215 tests
+python3 -m unittest discover -s tests   # 234 tests
 ```
 
 Writes require explicit user approval, except `token-rotate.sh` which only

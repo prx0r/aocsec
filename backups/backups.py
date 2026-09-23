@@ -18,6 +18,9 @@ DEFAULT_MANIFEST: list[dict] = [
      "max_age_hours": 24, "why": "dashboard access (600 perms)"},
     {"id": "aocsec-gateway-audit", "path": os.path.expanduser("~/.aocsec/gateway-audit.jsonl"),
      "max_age_hours": 168, "why": "gateway audit chain"},
+    {"id": "aocsec-audit-log", "path": os.path.expanduser("~/.aocsec/audit.jsonl"),
+     "max_age_hours": 168,
+     "why": "central audit sink — onboarding, attestations, maintenance, messages, gates"},
 ]
 
 
