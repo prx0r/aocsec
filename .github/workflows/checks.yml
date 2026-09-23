@@ -1,0 +1,44 @@
+name: aocsec checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"  # weekly Monday audit
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 -m unittest discover -s tests
+
+  scanners:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: secret scan (tracked files + recent history)
+        run: |
+          PAT='ghp_[A-Za-z0-9]{20,}|github_pat_|sk-live-[A-Za-z0-9]|AKIA[A-Z0-9]{16}|xox[bap]-'
+          git grep -E -c "$PAT" $(git rev-list --max-count=50 HEAD) -- . \
+            | grep -v ":0$" | grep -v secret-scan | head -5 && exit 1 || echo clean
+          test -z "$(git ls-files | grep -E '(^|/)\.env$')" || (echo "tracked env" && exit 1)
+      - name: structure scan (no dangerous primitives)
+        run: |
+          python3 -c "
+          import sys; sys.path.insert(0, '.')
+          from structure import scan_repo
+          r = scan_repo('.', exclude=('tests', 'test_', '__pycache__'))
+          print('files:', r['files'])
+          for f in r['findings']: print(f['severity'], f['file'], f['line'], f['check'])
+          sys.exit(0 if r['clean'] else 1)
+          "

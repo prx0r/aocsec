@@ -1,0 +1,22 @@
+{
+  "_comment": "Copy to gateway.json, replace secrets, chmod 600. Never commit the real file.",
+  "tokens": {
+    "customer-example": {
+      "secret": "GENERATE-32-RANDOM-BYTES-HERE",
+      "scopes": ["legislation:read"]
+    }
+  },
+  "backends": {
+    "legislation": {
+      "command": ["python3", "-m", "legislation.mcp_server"],
+      "cwd": "/home/ubuntu/aocsec",
+      "tools": {
+        "legislation_lookup": "legislation:read",
+        "obligations_for_business": "legislation:read",
+        "stale_rules": "legislation:read",
+        "instrument_detail": "legislation:read"
+      }
+    }
+  },
+  "audit_log": "/home/ubuntu/.aocsec/gateway-audit.jsonl"
+}
