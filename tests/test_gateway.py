@@ -100,6 +100,54 @@ class TestForwarding(unittest.TestCase):
         self.assertEqual(code, 502)
 
 
+class TestIdempotency(unittest.TestCase):
+    def _call(self, key, req_id):
+        return handle_request(
+            _cfg(), "Bearer s3cret-token",
+            {"jsonrpc": "2.0", "id": req_id, "method": "tools/call",
+             "params": {"name": "legislation_lookup", "arguments": {},
+                        "idempotency_key": key}})
+
+    def test_replay_returns_stored_without_reexecute(self):
+        import gateway.server as srv
+        calls = []
+
+        def counting(backend, payload, timeout=60):
+            calls.append(1)
+            return {"jsonrpc": "2.0", "id": 999,
+                    "result": {"n": len(calls)}}
+
+        with mock.patch.object(srv, "_backend_call", side_effect=counting):
+            code1, resp1 = self._call("replay-key-1", 10)
+            code2, resp2 = self._call("replay-key-1", 11)
+        self.assertEqual((code1, code2), (200, 200))
+        self.assertEqual(len(calls), 1)  # second call never hit backend
+        self.assertEqual(resp2["id"], 11)  # caller id still rewritten
+        self.assertEqual(resp2["result"], {"n": 1})
+
+    def test_different_keys_execute_twice(self):
+        import gateway.server as srv
+        with mock.patch.object(
+                srv, "_backend_call",
+                side_effect=_stub_backend({"ok": True})) as m:
+            self._call("k-a", 1)
+            self._call("k-b", 2)
+        self.assertEqual(m.call_count, 2)
+
+    def test_no_key_no_caching(self):
+        import gateway.server as srv
+        with mock.patch.object(
+                srv, "_backend_call",
+                side_effect=_stub_backend({"ok": True})) as m:
+            for i in (1, 2):
+                handle_request(
+                    _cfg(), "Bearer s3cret-token",
+                    {"jsonrpc": "2.0", "id": i, "method": "tools/call",
+                     "params": {"name": "legislation_lookup",
+                                "arguments": {}}})
+        self.assertEqual(m.call_count, 2)
+
+
 class TestAudit(unittest.TestCase):
     def test_audit_log_written_without_values(self):
         import tempfile

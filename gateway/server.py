@@ -57,6 +57,44 @@ class RateLimiter:
 LIMITER = RateLimiter()
 
 
+class IdempotencyStore:
+    """Replay-safe tools/call. Same (token, key) returns the stored
+    response instead of re-executing. TTL 24h, capped size."""
+
+    def __init__(self, ttl_s: int = 86400, max_entries: int = 1000):
+        self._lock = threading.Lock()
+        self._ttl = ttl_s
+        self._max = max_entries
+        self._store: dict[tuple[str, str], tuple[float, dict]] = {}
+
+    def check(self, token_id: str, key: str) -> dict | None:
+        now = time.time()
+        with self._lock:
+            hit = self._store.get((token_id, key))
+            if hit is None:
+                return None
+            ts, resp = hit
+            if now - ts > self._ttl:
+                del self._store[(token_id, key)]
+                return None
+            return resp
+
+    def store(self, token_id: str, key: str, response: dict) -> None:
+        with self._lock:
+            now = time.time()
+            old = [(k, ts) for k, (ts, _) in self._store.items()
+                   if now - ts > self._ttl]
+            for k, _ in old:
+                del self._store[k]
+            while len(self._store) >= self._max:
+                oldest = min(self._store, key=lambda k: self._store[k][0])
+                del self._store[oldest]
+            self._store[(token_id, key)] = (now, response)
+
+
+IDEMPOTENT = IdempotencyStore()
+
+
 @dataclass
 class Backend:
     name: str
@@ -181,6 +219,13 @@ def handle_request(cfg: GatewayConfig, auth_header: str, body: dict) -> tuple[in
             _audit(cfg, matched_id, name, False, "scope denied")
             return 403, {"jsonrpc": "2.0", "id": req_id,
                          "error": {"code": -32003, "message": "scope denied"}}
+        idem_key = params.get("idempotency_key", "") or ""
+        if idem_key:
+            cached = IDEMPOTENT.check(matched_id, idem_key)
+            if cached is not None:
+                replay = {**cached, "id": req_id}
+                _audit(cfg, matched_id, name, True, "idempotent replay")
+                return 200, replay
         try:
             resp = _backend_call(backend, {"jsonrpc": "2.0",
                                            "method": "tools/call",
@@ -191,6 +236,8 @@ def handle_request(cfg: GatewayConfig, auth_header: str, body: dict) -> tuple[in
                          "error": {"code": -32603, "message": "backend error"}}
         # rewrite backend msg id back to caller id
         resp["id"] = req_id
+        if idem_key and "error" not in resp:
+            IDEMPOTENT.store(matched_id, idem_key, resp)
         _audit(cfg, matched_id, name, True)
         return 200, resp
 
