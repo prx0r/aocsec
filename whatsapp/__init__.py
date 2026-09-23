@@ -11,6 +11,7 @@ WhatsApp Business Tools MCP path).
 from .messages import build_message
 from .optout import is_opted_in, record_consent, record_optout
 from .templates import TEMPLATES, get_template
+from .transport import send_payload, token_from_env
 
 __all__ = [
     "TEMPLATES",
@@ -19,4 +20,6 @@ __all__ = [
     "is_opted_in",
     "record_consent",
     "record_optout",
+    "send_payload",
+    "token_from_env",
 ]
