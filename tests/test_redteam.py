@@ -58,8 +58,9 @@ def evil_responder(message, session_id):
 
 
 class TestAttacks(unittest.TestCase):
-    def test_eleven_classes(self):
-        self.assertEqual(len(ATTACK_CLASSES), 11)
+    def test_twelve_classes(self):
+        self.assertEqual(len(ATTACK_CLASSES), 12)
+        self.assertIn("rulebook_poisoning", ATTACK_CLASSES)
         classes = {a["class"] for a in ATTACKS}
         self.assertEqual(classes, set(ATTACK_CLASSES))
 
