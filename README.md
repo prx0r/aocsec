@@ -41,12 +41,33 @@ aocsec/
 ├── README.md              # this file
 ├── AGENTS.md              # how security agents operate
 ├── SECURITY.md            # vulnerability reporting policy
-├── docs/
-│   ├── threat-model.md    # assets, actors, attack surfaces
-│   └── checklists/        # per-area audit checklists
+├── docs/                  # design + hardening guides (index below)
 ├── scripts/               # runnable audits (all read-only except token-rotate)
-└── findings/              # dated audit reports (YYYY-MM-DD-topic.md)
+├── findings/              # dated audit reports (YYYY-MM-DD-topic.md)
+├── redteam/               # adversarial suite: 12 attack classes, grader, runner
+├── legislation/           # obligation graph + tax seed + stdio MCP server
+├── rulebook_audit/        # rulebook chain/PII/poison/staleness auditor
+├── security_audit/        # free domain checks + paid digest-pinned reports
+├── freeagent/             # OAuth + read client + turnover bridge (no filing)
+├── jev/                   # cheap-judgment triage, confidence-gated (key-gated)
+├── tax/                   # safe organizer: turnover, MTD checklist, records
+└── tests/                 # 62 tests, fully mocked except live-API-free paths
 ```
+
+### Docs index
+
+| Doc | What |
+|-----|------|
+| threat-model.md | assets, actors, attack surfaces |
+| checklists/ | dashboard, secrets, MCP, VPS repeat audits |
+| muse-hardening.md | directory vs custom connectors, memory rule, remote-MCP requirement |
+| payments-hardening.md | Stripe Links + GoCardless + SAQ A, per-install checklist |
+| form-defense.md | Turnstile pattern for enquiry/booking forms |
+| freeagent.md | free route (NatWest/Mettle), API surface, OAuth flow, tiers |
+| jev-integration.md | setup, tool mapping, confidence policy, cost logic |
+| legislation-graph.md | graph design, pointers-not-rates, audit use, Muse path |
+| rulebook-security.md | entry contract, 5 audit checks, append-only writes |
+| cloudflare-access.md | Access setup + verify + rollback for dashboard origins |
 
 ## Rules
 

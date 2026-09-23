@@ -1,11 +1,20 @@
 # AGENTS.md — aocsec operations
 
-> Security agent for POW. Read-only unless explicitly authorized.
+> Security function for POW + aionboard. Read-only unless explicitly authorized.
+> Test suite: `python3 -m unittest discover -s tests` — 62 tests, must stay green.
 
-## What this is
+## What this repo holds
 
-aocsec is the security function for all POW repositories and the VPS they
-run on. It audits, reports, and fixes cheap issues. It never ships features.
+| Area | Code | Rule |
+|------|------|------|
+| Estate audits | `scripts/` (secret-scan, perms-audit, headers-check, token-rotate) | read-only except token-rotate |
+| Adversarial testing | `redteam/` (12 attack classes, grader, evidence runner) | test doubles live here; live runs need approval |
+| Legislation graph | `legislation/` (41 obligations + stdio MCP) | records carry sources; stale excluded |
+| Rulebook auditing | `rulebook_audit/` (chain, PII, poison, staleness) | flags, never auto-deletes |
+| Customer security product | `security_audit/` (free checks + paid reports) | customer-authorized domains only |
+| Bookkeeping integration | `freeagent/` (OAuth, reads, drafts) | no filing, no payments, no bank creds — by construction (no methods exist) |
+| Cheap judgments | `jev/` (triage, confidence-gated) | needs key; refuses without one; System One only |
+| Safe tax organizer | `tax/` (turnover, MTD checklist, records) | user figures in; thresholds user-supplied; no filing |
 
 ## How to operate
 
@@ -14,6 +23,7 @@ cd /home/ubuntu/aocsec
 ./scripts/secret-scan.sh     # secrets in repos (read-only)
 ./scripts/perms-audit.sh     # file/token permissions (read-only)
 ./scripts/headers-check.sh   # dashboard headers (read-only)
+python3 -m unittest discover -s tests   # 62 tests
 ```
 
 Writes require explicit user approval, except `token-rotate.sh` which only
@@ -30,19 +40,23 @@ touches `~/.powops/dashboard_token` and restarts the dashboard service.
 3. Fix critical/high immediately if the fix is safe and reviewable.
 4. Everything else gets an owner + remediation steps, never just a description.
 
-## Boundaries
+## Hard boundaries (violations caused real damage before)
 
+- aocsec is the ONLY repo this agent writes to. See the global scope rule
+  in `~/.config/opencode/AGENTS.md` — obey it over any task wording.
 - Do NOT read customer PII (aionboard CRM, emails, prospect lists).
 - Do NOT display secrets in logs, reports, or chat. Redact to first 4 chars.
 - Do NOT run destructive tests against production data.
 - Do NOT change garden collector code. File findings in the owning repo.
 - Credential rotation needs human confirmation (which credential, blast radius).
+- Tests that need network must tolerate absence (skip) or mock. Suite must
+  pass offline except checks explicitly marked live.
 
 ## Key files
 
 | File | Why |
 |------|-----|
 | findings/ | dated evidence, newest first |
-| docs/threat-model.md | what we protect and from whom |
-| docs/checklists/ | repeatable audits per area |
-| scripts/ | the actual audit tooling |
+| docs/ | design docs (see README index) + checklists |
+| scripts/allowlist.txt | reviewed scanner exceptions with reasons |
+| tests/ | mocked suites; live-network tests skip gracefully |
