@@ -70,3 +70,43 @@ Goal: connect trades demand to robot parts supply (goldmoat loop).
 - Threads: per-phase open items live here (findings/ for filed work).
 - Proof: runs/ style timestamped logs for every phase exit claim.
 - Review this plan quarterly. Delete what proved wrong.
+
+---
+
+## Addendum 2026-09-23 — promise review gate (amends Phase 1)
+
+Sales promises now exist per vertical (PROMISES.md) and two of them
+contradict the security architecture: auto-sent key/access instructions
+and auto-send bookings vs draft-never-send. New rule: **no install
+proceeds while its vertical's promises contradict the posture.**
+The promises review (findings/2026-09-23-aionboard-promises-review.md)
+is now a Phase 1 entry gate alongside eligibility. Either the promises
+get reworded or the architecture gains explicitly scoped pre-approvals
+— decided per item, on record, before customers.
+
+## Addendum 2026-09-23 — WhatsApp-native operations (new Phase 2b)
+
+Runs after Phase 1 starts producing installs, before scale:
+
+- Per-install WhatsApp wiring: opt-in recorded, templates selected,
+  24h-window behavior verified against staging, Business Agent scope
+  set (eligibility + ToS + payment-scope record).
+- Red-team via Agent Test API per install (free, unbilled, no users).
+- First real incident exercises the response playbook end to end.
+- Exit: 3 installs fully on WhatsApp rails with green staging runs.
+
+## Addendum 2026-09-23 — maintenance goes live (amends Phase 4)
+
+The maintenance engine (plans, runner, certified reports) is built and
+tested. Activation sequence per business: subscription record →
+scheduler timers → first monthly run → report vaulted → certificate
+issued. Billing state tracks plan/current; charging stays with
+Stripe/GoCardless. No new code expected — this is operations, not build.
+
+## Addendum 2026-09-23 — findings backlog (all filed, owners pending)
+
+- pow-site.service token (needs owner restart with fix).
+- Webhook URL, 5 API keys, ONS URLs, Cloudflare Access, Jev key.
+- aionboard promise contradictions (2 high, 3 medium — their call).
+- Each item names its owner and unblock condition in findings/.
+  Nothing here is "later" without a name and a trigger.
