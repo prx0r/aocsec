@@ -1,7 +1,7 @@
 # Legislation graph design
 
 > Structured regulatory data that chatbots run on, auditors audit with,
-> and Muse reaches via MCP. Status: built, 41 obligations, stdio MCP live.
+> and Muse reaches via MCP. Status: built, 42 obligations, stdio MCP live.
 
 ## What it is
 

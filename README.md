@@ -44,7 +44,7 @@ aocsec/
 ├── docs/                  # design + hardening guides (index below)
 ├── scripts/               # runnable audits (all read-only except token-rotate)
 ├── findings/              # dated audit reports (YYYY-MM-DD-topic.md)
-├── redteam/               # adversarial suite: 14 attack classes, grader, runner
+├── redteam/               # adversarial suite: 15 attack classes, grader, runner
 ├── legislation/           # obligation graph + tax seed + stdio MCP server
 ├── rulebook_audit/        # rulebook chain/PII/poison/staleness auditor
 ├── security_audit/        # free domain checks + paid digest-pinned reports
@@ -52,13 +52,16 @@ aocsec/
 ├── jev/                   # cheap-judgment triage, confidence-gated (key-gated)
 ├── tax/                   # safe organizer: turnover, MTD checklist, records
 ├── support/               # tickets+SLA, handoff, KB, e-manual, systems graph
+├── maintenance/           # monthly plans, runner, certified reports
+├── gateway/               # authenticated MCP bridge for remote/Muse access
+├── business_agent/        # Meta Business Agent gates, 24h window, payment scope
 ├── structure/             # AST scanner proving dangerous primitives absent
 ├── audit_chain/           # hash-chained append-only audit log
 ├── backups/               # manifest + freshness + restore drills
 ├── emailsec/              # SPF/DKIM/DMARC + invoice-fraud verification
 ├── devicecheck/           # device + backup checklists with state
 ├── presence/              # GBP/social ownership checklists with state
-└── tests/                 # 140+ tests, fully mocked except live-API-free paths
+└── tests/                 # 170 tests, fully mocked except live-API-free paths
 ```
 
 ### Docs index

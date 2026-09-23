@@ -1,21 +1,24 @@
 # AGENTS.md — aocsec operations
 
 > Security function for POW + aionboard. Read-only unless explicitly authorized.
-> Test suite: `python3 -m unittest discover -s tests` — 94 tests, must stay green.
+> Test suite: `python3 -m unittest discover -s tests` — 170 tests, must stay green.
 
 ## What this repo holds
 
 | Area | Code | Rule |
 |------|------|------|
 | Estate audits | `scripts/` (secret-scan, perms-audit, headers-check, token-rotate) | read-only except token-rotate |
-| Adversarial testing | `redteam/` (14 attack classes, grader, evidence runner) | test doubles live here; live runs need approval |
-| Legislation graph | `legislation/` (44 obligations + stdio MCP) | records carry sources; stale excluded |
+| Adversarial testing | `redteam/` (15 attack classes, grader, evidence runner) | test doubles live here; live runs need approval |
+| Legislation graph | `legislation/` (42 obligations + stdio MCP) | records carry sources; stale excluded |
 | Rulebook auditing | `rulebook_audit/` (chain, PII, poison, staleness) | flags, never auto-deletes |
 | Customer security product | `security_audit/` (free checks + paid reports) | customer-authorized domains only |
 | Bookkeeping integration | `freeagent/` (OAuth, reads, drafts) | no filing, no payments, no bank creds — by construction (no methods exist) |
 | Cheap judgments | `jev/` (triage, confidence-gated) | needs key; refuses without one; System One only |
 | Safe tax organizer | `tax/` (turnover, MTD checklist, records) | user figures in; thresholds user-supplied; no filing |
 | Support backend | `support/` (tickets, handoff, KB, e-manual) | human owns money/legal calls; bot drafts, human sends |
+| Maintenance product | `maintenance/` (plans, monthly runner, certificates) | proposals only; humans send/resolve |
+| Remote access | `gateway/` (Bearer auth, scoped tools, audit chain) | loopback + tunnel only; read-only v1 |
+| Business Agent gates | `business_agent/` (eligibility, ToS, 24h window, payment scope) | gate blocks selling to ineligible numbers |
 | Structural proof | `structure/` (AST scan: no eval/exec/shell/pickle) | run per release, fails on new capabilities |
 | Audit chain | `audit_chain/` (hash-linked log, redacting writes) | gateway migrated; tamper-evident |
 | Backup proof | `backups/` (manifest, freshness, drill records) | drills pass only with evidence |
@@ -27,7 +30,7 @@ cd /home/ubuntu/aocsec
 ./scripts/secret-scan.sh     # secrets in repos (read-only)
 ./scripts/perms-audit.sh     # file/token permissions (read-only)
 ./scripts/headers-check.sh   # dashboard headers (read-only)
-python3 -m unittest discover -s tests   # 94 tests
+python3 -m unittest discover -s tests   # 170 tests
 ```
 
 Writes require explicit user approval, except `token-rotate.sh` which only
