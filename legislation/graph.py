@@ -8,6 +8,7 @@ from datetime import date
 from pathlib import Path
 
 TAX_SEED = Path(__file__).parent / "tax_seed.json"
+VERTICAL_SEED = Path(__file__).parent / "vertical_seed.json"
 
 
 @dataclass
@@ -83,9 +84,16 @@ def load_tax_seed(path: str | Path = TAX_SEED) -> list[Obligation]:
         return [_from_registry_rule(r) for r in json.load(f).get("rules", [])]
 
 
+def load_vertical_seed(path: str | Path = VERTICAL_SEED) -> list[Obligation]:
+    """Load gap-filling rules for uncovered verticals."""
+    with open(path) as f:
+        return [_from_registry_rule(r) for r in json.load(f).get("rules", [])]
+
+
 def build_graph(
     registry_path: str | Path | None = None,
     tax_seed_path: str | Path = TAX_SEED,
+    vertical_seed_path: str | Path = VERTICAL_SEED,
 ) -> list[Obligation]:
     """All obligations from all sources. Dedupe by id (first wins).
 
@@ -93,7 +101,12 @@ def build_graph(
     cannot be cited, so they cannot be advised on.
     """
     seen: dict[str, Obligation] = {}
-    for ob in load_aionboard_registry(registry_path) + load_tax_seed(tax_seed_path):
+    sources = (
+        load_aionboard_registry(registry_path)
+        + load_tax_seed(tax_seed_path)
+        + load_vertical_seed(vertical_seed_path)
+    )
+    for ob in sources:
         if ob.id and ob.source_url and ob.id not in seen:
             seen[ob.id] = ob
     return list(seen.values())
@@ -105,17 +118,27 @@ def obligations_for(
     topic: str = "",
     domain: str = "",
     include_stale: bool = False,
+    aliases: dict[str, list[str]] | None = None,
 ) -> list[Obligation]:
     """Tailored advice set: filter by vertical/topic/domain, drop stale."""
     vertical = vertical.lower()
     topic = topic.lower()
     domain = domain.lower()
+    if aliases is None:
+        try:
+            from .verticals import _alias_map
+            aliases = _alias_map()
+        except ImportError:
+            aliases = {}
+    names = [vertical] + [a.lower() for a in aliases.get(vertical, [])]
     out = []
     for ob in obligations:
-        if vertical and vertical not in [a.lower() for a in ob.applies_to]:
-            # empty applies_to = general business rule, include it
-            if ob.applies_to:
-                continue
+        if vertical:
+            ob_names = [a.lower() for a in ob.applies_to]
+            if not any(n in ob_names for n in names):
+                # empty applies_to = general business rule, include it
+                if ob.applies_to:
+                    continue
         if domain and ob.domain.lower() != domain:
             continue
         if topic:

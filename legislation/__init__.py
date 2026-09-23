@@ -18,16 +18,21 @@ from .graph import (
     instruments,
     load_aionboard_registry,
     load_tax_seed,
+    load_vertical_seed,
     obligations_for,
     stale_rules,
 )
+from .verticals import VERTICALS, coverage_report
 
 __all__ = [
     "Obligation",
+    "VERTICALS",
     "build_graph",
+    "coverage_report",
     "instruments",
     "load_aionboard_registry",
     "load_tax_seed",
+    "load_vertical_seed",
     "obligations_for",
     "stale_rules",
 ]

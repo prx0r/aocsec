@@ -1,0 +1,54 @@
+{
+  "registry": "aocsec-vertical-seed/1",
+  "review_policy": "URLs verified live 2026-09-23. Rules state what applies to whom with official sources. Verify before quoting.",
+  "rules": [
+    {
+      "id": "LEG-UK-ADI",
+      "industries": ["driving-instructors"],
+      "jurisdiction": "UK",
+      "domain": "licensing",
+      "law": "Approved Driving Instructor registration",
+      "detail": "Instructors charging for car driving lessons must be registered as Approved Driving Instructors (ADIs), display their badge, and meet standards checks. Unregistered paid instruction is an offence.",
+      "citation": "Road Traffic Act 1988 Part V; DVSA ADI guidance",
+      "source_url": "https://www.gov.uk/become-a-driving-instructor",
+      "applies_when": "Charging money for driving lessons.",
+      "owner_action": "Register as ADI before taking paying pupils; display badge; maintain standards-check grade.",
+      "escalation": "DVSA for registration and standards queries.",
+      "failure_mode": "Prosecution for unregistered instruction; pupils uninsured.",
+      "basis": "verified-2026",
+      "review_date": "2026-12-31"
+    },
+    {
+      "id": "LEG-UK-WASTE-CARRIER",
+      "industries": ["gardeners-window-cleaners"],
+      "jurisdiction": "UK",
+      "domain": "environmental",
+      "law": "Waste carrier registration",
+      "detail": "Businesses transporting waste they produce (garden waste, trade refuse) need to check whether waste carrier registration applies to them. Registration tiers depend on waste type and role — check the live source.",
+      "citation": "Environment Agency waste carrier guidance",
+      "source_url": "https://www.gov.uk/register-renew-waste-carrier-broker-dealer-england",
+      "applies_when": "Carrying trade waste (e.g. garden clearances) for disposal.",
+      "owner_action": "Check whether your waste type needs upper- or lower-tier registration; register before carrying.",
+      "escalation": "Environment Agency for tier questions.",
+      "failure_mode": "Fixed-penalty notices and prosecution for unregistered carrying.",
+      "basis": "pointer-live-source",
+      "review_date": "2026-12-31"
+    },
+    {
+      "id": "LEG-UK-COSHH",
+      "industries": ["car-detailers", "cleaners"],
+      "jurisdiction": "UK",
+      "domain": "safety",
+      "law": "Control of Substances Hazardous to Health (COSHH)",
+      "detail": "Employers (and self-employed whose work affects others) must assess risks from hazardous substances — cleaning chemicals, solvents, detailing compounds — and control exposure. Includes safety data sheets, storage, and training.",
+      "citation": "COSHH Regulations 2002; HSE guidance",
+      "source_url": "https://www.hse.gov.uk/coshh/",
+      "applies_when": "Using chemical products beyond ordinary domestic use.",
+      "owner_action": "List products used, get safety data sheets, assess and record controls, train anyone exposed.",
+      "escalation": "HSE guidance or a safety consultant for complex assessments.",
+      "failure_mode": "Worker/customer harm; HSE enforcement on inspection or incident.",
+      "basis": "verified-2026",
+      "review_date": "2026-12-31"
+    }
+  ]
+}
