@@ -77,17 +77,36 @@ class TestMCP(unittest.TestCase):
                     r["result"]["serverInfo"]["name"], "aocsec-legislation")
                 r = await rpc(2, "tools/list", {})
                 names = [t["name"] for t in r["result"]["tools"]]
-                self.assertEqual(len(names), 4)
-                r = await rpc(3, "tools/call", {
-                    "name": "obligations_for_business",
-                    "arguments": {"vertical": "electrician"}})
-                d = json.loads(r["result"]["content"][0]["text"])
+                self.assertEqual(
+                    names, ["legislation_lookup", "obligations_for_business",
+                            "stale_rules", "instrument_detail"])
+
+                async def call(call_id, name, args):
+                    r = await rpc(call_id, "tools/call",
+                                  {"name": name, "arguments": args})
+                    return json.loads(r["result"]["content"][0]["text"])
+
+                d = await call(3, "obligations_for_business",
+                               {"vertical": "electrician"})
                 self.assertGreater(d["count"], 0)
-                r = await rpc(4, "tools/call", {
-                    "name": "instrument_detail",
-                    "arguments": {"law": "no-such-law"}})
-                d = json.loads(r["result"]["content"][0]["text"])
+                self.assertIn("obligations", d)
+
+                d = await call(4, "legislation_lookup",
+                               {"topic": "tax", "vertical": "electrician"})
+                self.assertGreater(d["count"], 0)
+
+                d = await call(5, "stale_rules", {})
+                self.assertIn("count", d)
+                self.assertIn("rules", d)
+
+                d = await call(6, "instrument_detail",
+                               {"law": "Construction Industry Scheme (CIS)"})
+                self.assertGreater(d["count"], 0)
+
+                d = await call(7, "instrument_detail",
+                               {"law": "no-such-law"})
                 self.assertIn("error", d)
+                self.assertIn("known", d)
             finally:
                 proc.terminate()
                 try:
