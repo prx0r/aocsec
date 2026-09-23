@@ -6,6 +6,11 @@ listing by business. The audit chain records issuance, the vault
 holds the bytes.
 """
 
-from .vault import get_document, list_documents, store_document
+from .vault import (
+    get_document,
+    init_vault_tables,
+    list_documents,
+    store_document,
+)
 
-__all__ = ["get_document", "list_documents", "store_document"]
+__all__ = ["get_document", "init_vault_tables", "list_documents", "store_document"]
