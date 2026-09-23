@@ -61,7 +61,10 @@ aocsec/
 ├── emailsec/              # SPF/DKIM/DMARC + invoice-fraud verification
 ├── devicecheck/           # device + backup checklists with state
 ├── presence/              # GBP/social ownership checklists with state
-└── tests/                 # 170 tests, fully mocked except live-API-free paths
+├── company/               # Companies House lookup + capability manifests
+├── isolation/             # per-agent identity checklists + loss arithmetic
+├── mcpscan/               # MCP tool-description poisoning scanner
+└── tests/                 # 179 tests, fully mocked except live-API-free paths
 ```
 
 ### Docs index
@@ -71,6 +74,12 @@ aocsec/
 | threat-model.md | assets, actors, attack surfaces |
 | checklists/ | dashboard, secrets, MCP, VPS repeat audits |
 | muse-hardening.md | directory vs custom connectors, memory rule, remote-MCP requirement |
+| muse-email.md | Meta-handles vs ours boundary for inbox threats |
+| business-agent-architecture.md | Meta platform endpoints, tokens, controls (imported) |
+| business-agent-posture.md | per-install posture for the live channel |
+| bisu-multiclient.md | one partner credential across client WABAs |
+| test-api-redteam.md | free staging attacks via Meta Test API |
+| whatsapp-tools-mcp-review.md | scope review checklist for Meta's setup MCP |
 | payments-hardening.md | Stripe Links + GoCardless + SAQ A, per-install checklist |
 | form-defense.md | Turnstile pattern for enquiry/booking forms |
 | freeagent.md | free route (NatWest/Mettle), API surface, OAuth flow, tiers |
@@ -78,11 +87,19 @@ aocsec/
 | legislation-graph.md | graph design, pointers-not-rates, audit use, Muse path |
 | rulebook-security.md | entry contract, 5 audit checks, append-only writes |
 | cloudflare-access.md | Access setup + verify + rollback for dashboard origins |
+| gateway.md | run + config + rules for the MCP bridge |
+| mcp-dependencies.md | adopt/track/avoid verdicts on third-party MCPs |
+| owasp-agentic-mapping.md | ASI01–ASI10 controls vs gaps |
 | structural-security.md | removed capabilities, audit chain, backup proof |
 | agent-shells.md | OpenMuse verdict: track, don't adopt |
+| agent-support.md | agent-managed support loop design |
+| agent-isolation.md | dedicated identities, capped wallets, revocation |
 | accounts-package.md | passwords, 2FA order, offboarding, insurance pointer |
 | vertical-security.md | per-trade threat notes + agent rules |
 | vertical-capability.md | what works per vertical (audited matrix) |
+| security-business-model.md | bundled baseline + paid depth tiers |
+| support-backend.md | adopt-vs-build map for desk tooling |
+| agentcom-influence-patterns.md | stolen/tracked/skipped verdicts |
 
 ## Rules
 

@@ -1,7 +1,7 @@
 # AGENTS.md — aocsec operations
 
 > Security function for POW + aionboard. Read-only unless explicitly authorized.
-> Test suite: `python3 -m unittest discover -s tests` — 170 tests, must stay green.
+> Test suite: `python3 -m unittest discover -s tests` — 179 tests, must stay green.
 
 ## What this repo holds
 
@@ -30,7 +30,7 @@ cd /home/ubuntu/aocsec
 ./scripts/secret-scan.sh     # secrets in repos (read-only)
 ./scripts/perms-audit.sh     # file/token permissions (read-only)
 ./scripts/headers-check.sh   # dashboard headers (read-only)
-python3 -m unittest discover -s tests   # 170 tests
+python3 -m unittest discover -s tests   # 179 tests
 ```
 
 Writes require explicit user approval, except `token-rotate.sh` which only
