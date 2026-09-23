@@ -64,7 +64,11 @@ aocsec/
 ├── company/               # Companies House lookup + capability manifests
 ├── isolation/             # per-agent identity checklists + loss arithmetic
 ├── mcpscan/               # MCP tool-description poisoning scanner
-└── tests/                 # 179 tests, fully mocked except live-API-free paths
+├── whatsapp/              # templates, opt-in/out, window-gated sends
+├── scheduler/             # job registry + compliance calendar
+├── vault/                 # content-addressed docs per business
+├── billing/               # subscription state (no charging, ever)
+└── tests/                 # 215 tests, fully mocked except live-API-free paths
 ```
 
 ### Docs index
