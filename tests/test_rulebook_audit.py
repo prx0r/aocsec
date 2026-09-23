@@ -98,5 +98,44 @@ class TestAudit(unittest.TestCase):
         Path(p).unlink()
 
 
+class TestMarkdownAudit(unittest.TestCase):
+    def test_fixture_tables(self):
+        import tempfile
+        from rulebook_audit.markdown import audit_markdown_rulebook
+        md = ("# T\n\n"
+              "| # | What goes wrong | Fix |\n"
+              "|---|---|---|\n"
+              "| 1 | AI promises dates | Never promise dates |\n"
+              "| 2 | Broken row |\n"
+              "| 3 | Call 07123 456789 | Do not call |\n")
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md",
+                                         delete=False) as f:
+            f.write(md)
+            path = f.name
+        try:
+            r = audit_markdown_rulebook(path)
+            self.assertEqual(r["rows"], 2)
+            self.assertEqual(r["malformed_rows"], 1)
+            self.assertEqual(len(r["pii_hits"]), 1)
+            self.assertTrue(r["clean"] is False)
+        finally:
+            Path(path).unlink()
+
+    def test_live_rulebooks_clean(self):
+        import glob
+        from rulebook_audit.markdown import audit_markdown_rulebook
+        files = sorted(glob.glob(
+            "/home/ubuntu/aionboard/verticals/*/RULEBOOK.md"))
+        self.assertEqual(len(files), 11)
+        total = 0
+        for f in files:
+            r = audit_markdown_rulebook(f)
+            self.assertEqual(r["pii_hits"], [], f)
+            self.assertEqual(r["poison_hits"], [], f)
+            self.assertEqual(r["malformed_rows"], 0, f)
+            total += r["rows"]
+        self.assertGreater(total, 300)
+
+
 if __name__ == "__main__":
     unittest.main()
