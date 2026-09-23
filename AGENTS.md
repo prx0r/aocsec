@@ -15,6 +15,9 @@
 | Bookkeeping integration | `freeagent/` (OAuth, reads, drafts) | no filing, no payments, no bank creds — by construction (no methods exist) |
 | Cheap judgments | `jev/` (triage, confidence-gated) | needs key; refuses without one; System One only |
 | Safe tax organizer | `tax/` (turnover, MTD checklist, records) | user figures in; thresholds user-supplied; no filing |
+| Structural proof | `structure/` (AST scan: no eval/exec/shell/pickle) | run per release, fails on new capabilities |
+| Audit chain | `audit_chain/` (hash-linked log, redacting writes) | gateway migrated; tamper-evident |
+| Backup proof | `backups/` (manifest, freshness, drill records) | drills pass only with evidence |
 
 ## How to operate
 

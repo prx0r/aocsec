@@ -51,6 +51,9 @@ aocsec/
 ├── freeagent/             # OAuth + read client + turnover bridge (no filing)
 ├── jev/                   # cheap-judgment triage, confidence-gated (key-gated)
 ├── tax/                   # safe organizer: turnover, MTD checklist, records
+├── structure/             # AST scanner proving dangerous primitives absent
+├── audit_chain/           # hash-chained append-only audit log
+├── backups/               # manifest + freshness + restore drills
 ├── emailsec/              # SPF/DKIM/DMARC + invoice-fraud verification
 ├── devicecheck/           # device + backup checklists with state
 ├── presence/              # GBP/social ownership checklists with state
@@ -71,6 +74,8 @@ aocsec/
 | legislation-graph.md | graph design, pointers-not-rates, audit use, Muse path |
 | rulebook-security.md | entry contract, 5 audit checks, append-only writes |
 | cloudflare-access.md | Access setup + verify + rollback for dashboard origins |
+| structural-security.md | removed capabilities, audit chain, backup proof |
+| agent-shells.md | OpenMuse verdict: track, don't adopt |
 | accounts-package.md | passwords, 2FA order, offboarding, insurance pointer |
 | vertical-security.md | per-trade threat notes + agent rules |
 | vertical-capability.md | what works per vertical (audited matrix) |

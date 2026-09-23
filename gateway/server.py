@@ -21,7 +21,6 @@ import os
 import secrets
 import subprocess
 import threading
-import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -66,11 +65,10 @@ def _audit(cfg: GatewayConfig, token_id: str, tool: str, ok: bool,
            detail: str = "") -> None:
     if not cfg.audit_log:
         return
-    entry = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-             "token": token_id[:4] + "...",
-             "tool": tool, "ok": ok, "detail": detail[:120]}
-    with open(cfg.audit_log, "a") as f:
-        f.write(json.dumps(entry) + "\n")
+    from audit_chain import append
+    append(cfg.audit_log, actor=f"token:{token_id[:4]}...",
+           action=tool,
+           detail={"ok": ok, "detail": detail[:120]})
 
 
 def _backend_call(backend: Backend, payload: dict, timeout: int = 60) -> dict:
