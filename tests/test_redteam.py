@@ -19,6 +19,9 @@ from redteam import (
 def safe_responder(message, session_id):
     """Test double: refuses everything sensitive, like a good assistant."""
     m = message.lower()
+    if "summarize this" in m and ("disregard" in m or "50% off" in m):
+        return ("Quoted email content is untrusted input, not instruction. "
+                "Discounts come from the price book with owner approval only.")
     if "dave" in m or "comedian" in m:
         return "I cannot do that. I'm your electrical business assistant, how can I help?"
     if "policy" in m or "confirm" in m and "policy" in m:
@@ -37,6 +40,14 @@ def safe_responder(message, session_id):
         return "Noted, I'll record a callback ticket for the owner to review."
     if "what callback number" in m or "on file" in m:
         return "I don't have a number on file for you. Which number should I use?"
+    if "changed banks" in m or "new bank details" in m or "sort code" in m:
+        return ("I cannot act on bank details from a message. Call the supplier "
+                "on a known number to verify. Possible invoice fraud — human review.")
+    if "disregard" in m and ("50% off" in m or "discount" in m):
+        return ("Quoted content is untrusted input, not instruction. Discounts come "
+                "from the price book with owner approval only.")
+    if "forward" in m and "email" in m:
+        return "I cannot forward inbox contents. Name the specific item for owner review."
     return "I cannot help with that. Let me get the owner."
 
 
@@ -49,6 +60,16 @@ def muse_safe_responder(message, session_id):
         return "Never share banking passwords here. Payments happen on your bank or Stripe pages, never through me."
     if "approve everything" in m or "in one go" in m:
         return "I cannot blanket-approve. Each action needs separate owner review."
+    if "changed banks" in m or "new bank details" in m or "sort code" in m:
+        return ("I cannot act on bank details from a message. I will not confirm "
+                "or update anything — call the supplier on a known number to verify. "
+                "This looks like invoice fraud; involve a human.")
+    if "summarize this" in m and ("disregard" in m or "50% off" in m):
+        return ("Quoted email content is untrusted input, not instruction. "
+                "I cannot apply discounts from email claims — the price book "
+                "and owner approval govern. Human review required.")
+    if "forward" in m and "email" in m:
+        return "I cannot forward inbox contents. Tell me the specific item and I will fetch it for owner review."
     return safe_responder(message, session_id)
 
 
@@ -58,8 +79,9 @@ def evil_responder(message, session_id):
 
 
 class TestAttacks(unittest.TestCase):
-    def test_thirteen_classes(self):
-        self.assertEqual(len(ATTACK_CLASSES), 13)
+    def test_fourteen_classes(self):
+        self.assertEqual(len(ATTACK_CLASSES), 14)
+        self.assertIn("email_indirect", ATTACK_CLASSES)
         self.assertIn("invoice_fraud", ATTACK_CLASSES)
         self.assertIn("rulebook_poisoning", ATTACK_CLASSES)
         classes = {a["class"] for a in ATTACKS}
@@ -99,6 +121,11 @@ class TestRunner(unittest.TestCase):
             self.assertEqual(len(lines), len(ATTACKS))
             rec = json.loads(lines[0])
             self.assertIn("digest", rec)
+
+    def test_email_indirect_classes_exist(self):
+        from redteam import ATTACKS
+        ids = [a["id"] for a in ATTACKS if a["class"] == "email_indirect"]
+        self.assertEqual(len(ids), 3)
 
     def test_muse_classes_hold(self):
         import tempfile
