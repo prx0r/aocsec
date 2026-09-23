@@ -25,6 +25,12 @@ def record_payment_scope(*, business_id: str, scope: str,
         raise ValueError("business_id and decided_by are required")
     from datetime import timedelta
     now = datetime.now(timezone.utc)
+    try:
+        from audit import audit as _audit
+        _audit(actor="business_agent", action="payment_scope.record",
+               business_id=business_id.strip(), detail={"scope": scope})
+    except Exception:
+        pass
     return {
         "business_id": business_id.strip(),
         "scope": scope,

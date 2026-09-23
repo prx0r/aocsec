@@ -66,4 +66,12 @@ def run_monthly(*, business_id: str, plan_id: str, domain: str = "",
         results["checks"]["backups"] = {
             "fresh": fresh["fresh"], "total": fresh["total"]}
 
+    try:
+        from audit import audit as _audit
+        _audit(actor="maintenance", action="run.completed",
+               business_id=business_id,
+               detail={"plan": plan_id,
+                       "legs": sorted(results["checks"])})
+    except Exception:
+        pass
     return results

@@ -11,6 +11,12 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime, timezone
 
+try:
+    from audit import audit as _audit
+except ImportError:  # pragma: no cover - standalone use
+    def _audit(*a, **k):
+        return None
+
 
 def init_verify_tables(connection: sqlite3.Connection) -> None:
     connection.executescript(
@@ -54,6 +60,11 @@ def record_attestation(connection: sqlite3.Connection, *,
         (business_id.strip(), qualification.strip(), verdict,
          reference.strip()[:120], verified_by.strip(), _now()))
     connection.commit()
+    _audit(actor="verify", action=f"attestation.{verdict}",
+           business_id=business_id.strip(),
+           detail={"qualification": qualification.strip(),
+                   "reference": reference.strip()[:40],
+                   "verified_by": verified_by.strip()})
     return {"business_id": business_id.strip(),
             "qualification": qualification.strip(), "verdict": verdict}
 

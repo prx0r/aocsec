@@ -21,10 +21,40 @@ import os
 import secrets
 import subprocess
 import threading
+import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
+
+# Default rate limit: 60 calls / 60s per token. Configurable per token
+# via "rate_limit": {"calls": N, "window_s": M} in gateway.json.
+DEFAULT_RATE = {"calls": 60, "window_s": 60}
+
+
+class RateLimiter:
+    """Per-token sliding window. In-memory; restarts reset budgets."""
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._hits: dict[str, list[float]] = {}
+
+    def check(self, token_id: str, calls: int = 60,
+              window_s: int = 60) -> bool:
+        """True when allowed (and recorded). False when over budget."""
+        now = time.time()
+        with self._lock:
+            hits = [t for t in self._hits.get(token_id, [])
+                    if now - t < window_s]
+            if len(hits) >= calls:
+                self._hits[token_id] = hits
+                return False
+            hits.append(now)
+            self._hits[token_id] = hits
+            return True
+
+
+LIMITER = RateLimiter()
 
 
 @dataclass
@@ -116,6 +146,16 @@ def handle_request(cfg: GatewayConfig, auth_header: str, body: dict) -> tuple[in
             break
     if matched is None:
         return 401, {"error": "bad token"}
+
+    rl = matched.get("rate_limit", {})
+    if not LIMITER.check(matched_id,
+                         calls=int(rl.get("calls", DEFAULT_RATE["calls"])),
+                         window_s=int(rl.get("window_s",
+                                             DEFAULT_RATE["window_s"]))):
+        _audit(cfg, matched_id, body.get("method", "unknown") or "unknown",
+               False, "rate limited")
+        return 429, {"jsonrpc": "2.0", "id": body.get("id"),
+                     "error": {"code": -32004, "message": "rate limited"}}
 
     method = body.get("method", "")
     params = body.get("params", {}) or {}

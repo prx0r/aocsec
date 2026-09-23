@@ -9,6 +9,16 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+
+def _audit_gate(business_id: str, passed: bool, detail: str) -> None:
+    try:
+        from audit import audit as _audit
+        _audit(actor="business_agent", action="gate_install",
+               business_id=business_id,
+               detail={"passed": passed, "detail": detail[:120]})
+    except Exception:
+        pass
+
 # Per Meta docs: agent unavailable in these verticals.
 EXCLUDED_VERTICALS = (
     "finance", "government", "health", "alcohol", "gambling",
@@ -73,11 +83,13 @@ def gate_install(*, business_id: str, vertical: str, country_eligible: bool,
         cloud_api=cloud_api, good_standing=good_standing,
         single_agent=single_agent)
     if not elig["eligible"]:
+        _audit_gate(business_id, False, "eligibility failed")
         return {"go": False, "eligibility": elig, "tos": None}
     tos = None
     if tos_accepted_by.strip():
         tos = record_tos_acceptance(business_id=business_id,
                                     accepted_by=tos_accepted_by)
+    _audit_gate(business_id, True, "passed")
     return {"go": True, "eligibility": elig, "tos": tos,
             "note": None if tos else "ToS acceptance still required "
                                      "before any API call."}

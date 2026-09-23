@@ -10,6 +10,12 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime, timezone
 
+try:
+    from audit import audit as _audit
+except ImportError:  # pragma: no cover - standalone use
+    def _audit(*a, **k):
+        return None
+
 STAGES = (
     "contacted",
     "interested",
@@ -107,6 +113,8 @@ def record_consent(connection: sqlite3.Connection, business_id: str, *,
         raise LookupError(f"unknown business: {business_id}")
     record_evidence(connection, business_id, "consent_recorded",
                     "consent_basis", basis.strip())
+    _audit(actor="onboarding", action="consent.recorded",
+           business_id=business_id, detail={"basis": basis.strip()})
     return advance(connection, business_id)
 
 
@@ -145,6 +153,8 @@ def advance(connection: sqlite3.Connection, business_id: str) -> dict:
         "UPDATE ob_prospects SET stage=?, updated_at=? WHERE business_id=?",
         (nxt, _now(), business_id))
     connection.commit()
+    _audit(actor="onboarding", action=f"stage.{nxt}",
+           business_id=business_id, detail={"from": current})
     return pipeline_status(connection, business_id)
 
 
