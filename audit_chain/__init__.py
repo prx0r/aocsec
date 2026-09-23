@@ -10,6 +10,26 @@ Values never enter the log: callers pass shapes/hashes/counts, and
 the module redacts anything looking like a secret anyway.
 """
 
+from .certificates import Certificate
 from .chain import append, create_log, verify
+from .merkle import (
+    inclusion_path,
+    leaf_hash,
+    merkle_root,
+    node_hash,
+    seal_log,
+    verify_inclusion,
+)
 
-__all__ = ["append", "create_log", "verify"]
+__all__ = [
+    "Certificate",
+    "append",
+    "create_log",
+    "inclusion_path",
+    "leaf_hash",
+    "merkle_root",
+    "node_hash",
+    "seal_log",
+    "verify",
+    "verify_inclusion",
+]

@@ -82,6 +82,53 @@ class TestAuditChain(unittest.TestCase):
             self.assertEqual(r["entries"], 0)
 
 
+class TestMerkleSeal(unittest.TestCase):
+    def test_root_and_inclusion(self):
+        from audit_chain import (
+            inclusion_path, merkle_root, seal_log, verify_inclusion)
+        leaves = [f"entry-{i}".encode() for i in range(5)]
+        root = merkle_root(leaves)
+        for i in range(5):
+            path = inclusion_path(leaves, i)
+            self.assertTrue(verify_inclusion(leaves[i], path, root))
+        self.assertFalse(verify_inclusion(b"forged", inclusion_path(leaves, 0), root))
+
+    def test_seal_sidecar(self):
+        import tempfile
+        from audit_chain import append, seal_log
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            log = str(Path(tmp) / "a.jsonl")
+            append(log, actor="t", action="a")
+            append(log, actor="t", action="b")
+            seal = seal_log(log)
+            self.assertEqual(seal["entries"], 2)
+            sidecar = Path(str(log) + ".seals.jsonl")
+            self.assertTrue(sidecar.exists())
+
+    def test_empty_root(self):
+        from audit_chain import merkle_root
+        self.assertEqual(len(merkle_root([])), 64)
+
+
+class TestCertificates(unittest.TestCase):
+    def test_seal_verify(self):
+        from audit_chain import Certificate
+        c = Certificate(cert_type="report", subject="example.com",
+                        evidence=[{"sha": "abc"}]).seal()
+        self.assertTrue(c.verify())
+
+    def test_tamper_detected(self):
+        from audit_chain import Certificate
+        c = Certificate(cert_type="approval", subject="x").seal()
+        c.subject = "y"
+        self.assertFalse(c.verify())
+
+    def test_unsealed_fails(self):
+        from audit_chain import Certificate
+        self.assertFalse(Certificate(cert_type="x", subject="y").verify())
+
+
 class TestBackups(unittest.TestCase):
     def test_fresh_and_stale(self):
         import time
