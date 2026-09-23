@@ -1,6 +1,6 @@
 #!/bin/bash
 # token-rotate.sh — rotate powops dashboard token + restart dashboard. WRITES.
-set -e
+set -eu
 python3 -c "import secrets; print(secrets.token_urlsafe(24))" > ~/.powops/dashboard_token
 chmod 600 ~/.powops/dashboard_token
 systemctl --user restart powops-dashboard.service

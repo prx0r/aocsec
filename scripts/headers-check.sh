@@ -1,4 +1,5 @@
 #!/bin/bash
+set -u
 # headers-check.sh — verify dashboard security headers. Read-only.
 TOKEN=$(cat ~/.powops/dashboard_token)
 echo "--- CSP ---"

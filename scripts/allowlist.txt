@@ -1,0 +1,2 @@
+# Reviewed false positives. Format: repo:path # reason
+powstock:HUMAN_TASKS.md # placeholder token format in human setup docs, no real credential (reviewed 2026-09-23)
