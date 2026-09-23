@@ -39,6 +39,31 @@ class TestEligibility(unittest.TestCase):
                    {"good_standing": False}, {"single_agent": False}):
             self.assertFalse(self._ok(**kw)["eligible"])
 
+    def test_payment_scope(self):
+        from business_agent import (
+            SCOPES, record_payment_scope, widen_scope)
+        self.assertEqual(list(SCOPES),
+                         ["handoff_only", "quotes", "bookings", "payments"])
+        r = record_payment_scope(business_id="b1", scope="handoff_only",
+                                 decided_by="owner")
+        self.assertIn("review_by", r)
+        w = widen_scope(r, to_scope="quotes", decided_by="owner")
+        self.assertEqual(w["scope"], "quotes")
+        n = widen_scope(w, to_scope="handoff_only", decided_by="owner")
+        self.assertEqual(n["scope"], "handoff_only")
+        with self.assertRaises(ValueError):
+            record_payment_scope(business_id="b1", scope="everything",
+                                 decided_by="owner")
+
+    def test_handoff_window_constraint(self):
+        from support import build_context_package
+        pkg = build_context_package(
+            customer_wants="Fix tap", tried=[], unresolved="slot?",
+            business_id="b1", channel="whatsapp",
+            last_user_message_at="2020-01-01T00:00:00+00:00")
+        self.assertIn("channel_constraint", pkg)
+        self.assertIn("template", pkg["channel_constraint"])
+
     def test_tos_record(self):
         r = record_tos_acceptance(business_id="b1", accepted_by="owner")
         self.assertIn("at", r)
@@ -68,6 +93,21 @@ class TestWindow(unittest.TestCase):
     def test_future_timestamp(self):
         self.assertFalse(in_freeform_window(
             "2026-09-24T10:00:00+00:00", now="2026-09-23T12:00:00+00:00"))
+
+    def test_gate_blocks_and_passes(self):
+        from business_agent import gate_install
+        blocked = gate_install(
+            business_id="b1", vertical="electrician",
+            country_eligible=False, cloud_api=True, good_standing=True,
+            single_agent=True)
+        self.assertFalse(blocked["go"])
+        self.assertIsNone(blocked["tos"])
+        gated = gate_install(
+            business_id="b1", vertical="electrician",
+            country_eligible=True, cloud_api=True, good_standing=True,
+            single_agent=True, tos_accepted_by="owner")
+        self.assertTrue(gated["go"])
+        self.assertIsNotNone(gated["tos"])
 
     def test_garbage(self):
         self.assertFalse(in_freeform_window("not-a-date"))

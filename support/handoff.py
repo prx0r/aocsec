@@ -53,9 +53,11 @@ def build_context_package(*, customer_wants: str, tried: list[str],
                           business_name: str = "",
                           transcript_tail: list[str] | None = None,
                           systems: list[dict] | None = None,
-                          qualifications: list[str] | None = None) -> dict:
+                          qualifications: list[str] | None = None,
+                          last_user_message_at: str = "",
+                          channel: str = "") -> dict:
     """Compile the handoff package. Max 3-sentence summary + facts."""
-    return {
+    pkg = {
         "business_id": business_id,
         "business_name": business_name,
         "wants": customer_wants[:300],
@@ -68,3 +70,10 @@ def build_context_package(*, customer_wants: str, tried: list[str],
         "instruction": "Start from this package. Do not ask the customer "
                        "to repeat anything above.",
     }
+    if channel.lower() == "whatsapp" and last_user_message_at:
+        from business_agent.window import window_status
+        window = window_status(last_user_message_at)
+        pkg["channel_constraint"] = (
+            f"WhatsApp window {window['window']}: {window['may_send']}. "
+            f"{window['note']}")
+    return pkg

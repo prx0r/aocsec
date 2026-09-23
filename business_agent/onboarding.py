@@ -58,3 +58,26 @@ def record_tos_acceptance(*, business_id: str, accepted_by: str,
         "note": "Meta Business Agent Terms accepted in WhatsApp Manager. "
                 "API calls require this first.",
     }
+
+
+def gate_install(*, business_id: str, vertical: str, country_eligible: bool,
+                 cloud_api: bool, good_standing: bool, single_agent: bool,
+                 tos_accepted_by: str = "") -> dict:
+    """Pre-onboarding gate: eligibility first, then ToS.
+
+    Returns {"go": bool, "eligibility": {...}, "tos": {...} or None}.
+    A False go means: do not sell, do not configure, do not proceed.
+    """
+    elig = eligibility_checklist(
+        vertical=vertical, country_eligible=country_eligible,
+        cloud_api=cloud_api, good_standing=good_standing,
+        single_agent=single_agent)
+    if not elig["eligible"]:
+        return {"go": False, "eligibility": elig, "tos": None}
+    tos = None
+    if tos_accepted_by.strip():
+        tos = record_tos_acceptance(business_id=business_id,
+                                    accepted_by=tos_accepted_by)
+    return {"go": True, "eligibility": elig, "tos": tos,
+            "note": None if tos else "ToS acceptance still required "
+                                     "before any API call."}

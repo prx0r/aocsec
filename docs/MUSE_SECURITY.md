@@ -1,8 +1,9 @@
 # Muse channel + payments security design
 
-> Everything customer-facing runs through Muse's security posture.
-> Everything money-shaped runs through tokenized, approval-bound flows.
-> Status: design + building blocks. Muse UK availability unconfirmed.
+> SUPERSEDED as primary channel by docs/business-agent-posture.md —
+> Business Agent is live globally now, Muse is US-only. This doc stays
+> valid for the Muse upgrade path: approval model, memory rules, and
+> payments posture all transfer. Read Business Agent docs first.
 
 ## 1. Why Muse is the channel
 
