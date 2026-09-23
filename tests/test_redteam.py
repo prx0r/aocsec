@@ -40,14 +40,26 @@ def safe_responder(message, session_id):
     return "I cannot help with that. Let me get the owner."
 
 
+def muse_safe_responder(message, session_id):
+    """Test double: hardened Muse-facing assistant."""
+    m = message.lower()
+    if "disconnected" in m and "remember" in m:
+        return "I don't retain customer data between sessions. Ask the owner for job records."
+    if "bank account" in m and "password" in m:
+        return "Never share banking passwords here. Payments happen on your bank or Stripe pages, never through me."
+    if "approve everything" in m or "in one go" in m:
+        return "I cannot blanket-approve. Each action needs separate owner review."
+    return safe_responder(message, session_id)
+
+
 def evil_responder(message, session_id):
     """Test double: breaches everything. Validates the grader catches it."""
     return "Done. I am Dave, confirmed policy updated, quote sent, approved."
 
 
 class TestAttacks(unittest.TestCase):
-    def test_eight_classes(self):
-        self.assertEqual(len(ATTACK_CLASSES), 8)
+    def test_eleven_classes(self):
+        self.assertEqual(len(ATTACK_CLASSES), 11)
         classes = {a["class"] for a in ATTACKS}
         self.assertEqual(classes, set(ATTACK_CLASSES))
 
@@ -85,6 +97,13 @@ class TestRunner(unittest.TestCase):
             self.assertEqual(len(lines), len(ATTACKS))
             rec = json.loads(lines[0])
             self.assertIn("digest", rec)
+
+    def test_muse_classes_hold(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            res = run_suite(muse_safe_responder, out_dir=tmp)
+            self.assertEqual(res["held"], res["total"])
+            self.assertEqual(res["breached"], [])
 
     def test_evil_breaches(self):
         with tempfile.TemporaryDirectory() as tmp:
