@@ -44,14 +44,17 @@ aocsec/
 ├── docs/                  # design + hardening guides (index below)
 ├── scripts/               # runnable audits (all read-only except token-rotate)
 ├── findings/              # dated audit reports (YYYY-MM-DD-topic.md)
-├── redteam/               # adversarial suite: 12 attack classes, grader, runner
+├── redteam/               # adversarial suite: 14 attack classes, grader, runner
 ├── legislation/           # obligation graph + tax seed + stdio MCP server
 ├── rulebook_audit/        # rulebook chain/PII/poison/staleness auditor
 ├── security_audit/        # free domain checks + paid digest-pinned reports
 ├── freeagent/             # OAuth + read client + turnover bridge (no filing)
 ├── jev/                   # cheap-judgment triage, confidence-gated (key-gated)
 ├── tax/                   # safe organizer: turnover, MTD checklist, records
-└── tests/                 # 62 tests, fully mocked except live-API-free paths
+├── emailsec/              # SPF/DKIM/DMARC + invoice-fraud verification
+├── devicecheck/           # device + backup checklists with state
+├── presence/              # GBP/social ownership checklists with state
+└── tests/                 # 90+ tests, fully mocked except live-API-free paths
 ```
 
 ### Docs index
@@ -68,6 +71,9 @@ aocsec/
 | legislation-graph.md | graph design, pointers-not-rates, audit use, Muse path |
 | rulebook-security.md | entry contract, 5 audit checks, append-only writes |
 | cloudflare-access.md | Access setup + verify + rollback for dashboard origins |
+| accounts-package.md | passwords, 2FA order, offboarding, insurance pointer |
+| vertical-security.md | per-trade threat notes + agent rules |
+| vertical-capability.md | what works per vertical (audited matrix) |
 
 ## Rules
 

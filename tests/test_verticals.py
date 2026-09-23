@@ -12,7 +12,7 @@ class TestVerticals(unittest.TestCase):
 
     def test_seed_loads(self):
         seed = load_vertical_seed()
-        self.assertEqual(len(seed), 3)
+        self.assertEqual(len(seed), 4)
         for o in seed:
             self.assertTrue(o.source_url)
             self.assertTrue(o.review_date)
