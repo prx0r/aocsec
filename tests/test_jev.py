@@ -1,5 +1,6 @@
 """Tests for aocsec jev triage + client. Fully mocked — no key, no network."""
 
+import json
 import unittest
 from unittest import mock
 
@@ -78,6 +79,54 @@ class TestVerify(unittest.TestCase):
             [{"claim": "x", "evidence": "y"}],
             lambda t, a: {"verdict": "supported", "confidence": 0.5})
         self.assertEqual(out[0]["verdict"], "needs_human")
+
+
+class TestClientProtocol(unittest.TestCase):
+    def _proc(self, lines):
+        proc = mock.MagicMock()
+        proc.poll.return_value = None
+        proc.stdout.readline.side_effect = lines
+        return proc
+
+    def test_hello_and_call(self):
+        with mock.patch.dict("os.environ", {"TYPESAFE_API_KEY": "k"}):
+            with mock.patch("subprocess.Popen") as popen:
+                proc = self._proc([
+                    json.dumps({"jsonrpc": "2.0", "id": 1, "result": {}}) + "\n",
+                    json.dumps({"jsonrpc": "2.0", "id": 2,
+                                "result": {"verdict": "ok"}}) + "\n",
+                ])
+                popen.return_value = proc
+                with JevMCP() as client:
+                    out = client.call("jev_verify", {"claim": "x"})
+                self.assertEqual(out, {"verdict": "ok"})
+                sent = proc.stdin.write.call_args_list[0][0][0]
+                self.assertIn("initialize", sent)
+
+    def test_empty_response_raises(self):
+        with mock.patch.dict("os.environ", {"TYPESAFE_API_KEY": "k"}):
+            with mock.patch("subprocess.Popen") as popen:
+                proc = self._proc([
+                    json.dumps({"jsonrpc": "2.0", "id": 1, "result": {}}) + "\n",
+                    "",
+                ])
+                popen.return_value = proc
+                with JevMCP() as client:
+                    with self.assertRaises(JevError):
+                        client.call("jev_verify", {})
+
+    def test_error_response_raises(self):
+        with mock.patch.dict("os.environ", {"TYPESAFE_API_KEY": "k"}):
+            with mock.patch("subprocess.Popen") as popen:
+                proc = self._proc([
+                    json.dumps({"jsonrpc": "2.0", "id": 1, "result": {}}) + "\n",
+                    json.dumps({"jsonrpc": "2.0", "id": 2,
+                                "error": {"code": -32601, "message": "nope"}}) + "\n",
+                ])
+                popen.return_value = proc
+                with JevMCP() as client:
+                    with self.assertRaises(JevError):
+                        client.call("nope", {})
 
 
 class TestGate(unittest.TestCase):

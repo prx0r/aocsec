@@ -89,6 +89,45 @@ class TestClient(unittest.TestCase):
             c.draft_invoice_payload(contact="x", dated_on="y", items=[])
 
 
+class TestClientReads(unittest.TestCase):
+    def test_expenses(self):
+        import json as _json
+        from unittest.mock import MagicMock, patch
+        import urllib.request
+
+        def fake_resp(payload):
+            cm = MagicMock()
+            m = MagicMock()
+            m.read.return_value = _json.dumps(payload).encode()
+            cm.__enter__.return_value = m
+            cm.__exit__.return_value = False
+            return cm
+
+        with patch.object(urllib.request, "urlopen",
+                          return_value=fake_resp({"expenses": [{"id": 1}]})):
+            out = FreeAgentClient("tok").expenses()
+        self.assertEqual(len(out), 1)
+
+    def test_bank_transactions(self):
+        import json as _json
+        from unittest.mock import MagicMock, patch
+        import urllib.request
+
+        def fake_resp(payload):
+            cm = MagicMock()
+            m = MagicMock()
+            m.read.return_value = _json.dumps(payload).encode()
+            cm.__enter__.return_value = m
+            cm.__exit__.return_value = False
+            return cm
+
+        with patch.object(urllib.request, "urlopen",
+                          return_value=fake_resp(
+                              {"bank_transactions": [{"id": 9}]})):
+            out = FreeAgentClient("tok").bank_transactions("123")
+        self.assertEqual(len(out), 1)
+
+
 class TestTurnoverBridge(unittest.TestCase):
     def test_sums_paid_only(self):
         invs = [
