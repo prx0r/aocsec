@@ -51,13 +51,14 @@ aocsec/
 ├── freeagent/             # OAuth + read client + turnover bridge (no filing)
 ├── jev/                   # cheap-judgment triage, confidence-gated (key-gated)
 ├── tax/                   # safe organizer: turnover, MTD checklist, records
+├── support/               # tickets+SLA, handoff, KB, e-manual, systems graph
 ├── structure/             # AST scanner proving dangerous primitives absent
 ├── audit_chain/           # hash-chained append-only audit log
 ├── backups/               # manifest + freshness + restore drills
 ├── emailsec/              # SPF/DKIM/DMARC + invoice-fraud verification
 ├── devicecheck/           # device + backup checklists with state
 ├── presence/              # GBP/social ownership checklists with state
-└── tests/                 # 90+ tests, fully mocked except live-API-free paths
+└── tests/                 # 140+ tests, fully mocked except live-API-free paths
 ```
 
 ### Docs index
