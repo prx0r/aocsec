@@ -26,6 +26,11 @@ threat review explicitly allows them with gates attached.
 to it. Secrets redacted at write time (key-shaped names + long opaque
 strings). Tamper, deletion, and reorder all break verification.
 
+Two capabilities ported from prx0r/proofdesk foxit audit (MIT, credited
+in code): Merkle epoch sealing (compact inclusion proofs over entry
+ranges, sidecar seals) and self-hashing certificates (tamper-evident
+report/approval artifacts — the paid-report proof object).
+
 ## Backups (prove survival)
 
 `backups/` — manifest of what must survive (powops state, tokens,
