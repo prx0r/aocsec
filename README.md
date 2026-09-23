@@ -106,6 +106,7 @@ aocsec/
 | vertical-capability.md | what works per vertical (audited matrix) |
 | security-business-model.md | bundled baseline + paid depth tiers |
 | support-backend.md | adopt-vs-build map for desk tooling |
+| DEV-PLAN.md | extended plan: 5 phases with exit criteria |
 | agentcom-influence-patterns.md | stolen/tracked/skipped verdicts |
 
 ## Rules
